@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const ticketRoutes = require('./routes/ticketRoutes');
@@ -49,6 +51,15 @@ app.use(
 // ── Body parser ──────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10kb' }));
 
+// ── Frontend static files (single-container deployment) ────────────────
+const frontendDistPath = path.resolve(__dirname, '../frontend/dist');
+const frontendIndexPath = path.join(frontendDistPath, 'index.html');
+const hasFrontendBuild = fs.existsSync(frontendDistPath) && fs.existsSync(frontendIndexPath);
+
+if (hasFrontendBuild) {
+  app.use(express.static(frontendDistPath));
+}
+
 // ── Health-check endpoint ────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ success: true, message: 'DeskFlow API is running' });
@@ -57,7 +68,17 @@ app.get('/api/health', (_req, res) => {
 // ── Routes ───────────────────────────────────────────────────────────────
 app.use('/api/tickets', ticketRoutes);
 
-// ── Catch-all for unmatched routes ───────────────────────────────────────
+if (hasFrontendBuild) {
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+
+    return res.sendFile(frontendIndexPath);
+  });
+}
+
+// ── Catch-all for unmatched routes ─────────────────────────────────────
 app.all('*', (req, res) => {
   res.status(404).json({
     success: false,
