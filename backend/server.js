@@ -1,11 +1,11 @@
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Load environment variables before anything else
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const ticketRoutes = require('./routes/ticketRoutes');
@@ -27,9 +27,12 @@ const configuredOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+const vercelOrigin = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+
 const allowedOrigins = new Set([
   'http://localhost:5173',
   'http://localhost:5174',
+  ...(vercelOrigin ? [vercelOrigin] : []),
   ...configuredOrigins,
 ]);
 
@@ -94,6 +97,12 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
+    if (!process.env.MONGODB_URI) {
+      throw new Error(
+        'Missing MONGODB_URI. Add it to Railway Environment Variables or your local .env file.'
+      );
+    }
+
     await connectDB();
 
     app.listen(PORT, () => {
