@@ -1,128 +1,91 @@
 const dotenv = require('dotenv');
-const path = require('path');
-
-// Load environment variables before anything else
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config();
 
 const express = require('express');
-const fs = require('fs');
 const cors = require('cors');
+
 const connectDB = require('./config/db');
 const ticketRoutes = require('./routes/ticketRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 /**
- * DeskFlow API Server
- *
- * Express application that serves the support-ticket triage board API.
- * Connects to MongoDB, applies middleware, mounts routes, and starts
- * listening on the configured port.
+ * DeskFlow Backend Server
+ * MERN Stack Support Ticket System
  */
 
 const app = express();
 
-// ── CORS ─────────────────────────────────────────────────────────────────
-const configuredOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+// ─────────────────────────────────────────────
+// DATABASE CONNECTION
+// ─────────────────────────────────────────────
+connectDB();
 
-const vercelOrigin = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+// ─────────────────────────────────────────────
+// MIDDLEWARE
+// ─────────────────────────────────────────────
 
-const allowedOrigins = new Set([
-  'http://localhost:5173',
-  'http://localhost:5174',
-  ...(vercelOrigin ? [vercelOrigin] : []),
-  ...configuredOrigins,
-]);
+// CORS
+app.use(cors());
+// Body Parser
+app.use(express.json());
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.has(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error(`CORS blocked for origin: ${origin}`), false);
-    },
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
-
-// ── Body parser ──────────────────────────────────────────────────────────
-app.use(express.json({ limit: '10kb' }));
-
-// ── Frontend static files (single-container deployment) ────────────────
-const frontendDistPath = path.resolve(__dirname, '../frontend/dist');
-const frontendIndexPath = path.join(frontendDistPath, 'index.html');
-const hasFrontendBuild = fs.existsSync(frontendDistPath) && fs.existsSync(frontendIndexPath);
-
-if (hasFrontendBuild) {
-  app.use(express.static(frontendDistPath));
-}
-
-// ── Health-check endpoint ────────────────────────────────────────────────
-app.get('/api/health', (_req, res) => {
-  res.status(200).json({ success: true, message: 'DeskFlow API is running' });
+// ─────────────────────────────────────────────
+// HEALTH CHECK ROUTE
+// ─────────────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'DeskFlow API is running successfully',
+  });
 });
 
-// ── Routes ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// API ROUTES
+// ─────────────────────────────────────────────
 app.use('/api/tickets', ticketRoutes);
 
-if (hasFrontendBuild) {
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-
-    return res.sendFile(frontendIndexPath);
-  });
-}
-
-// ── Catch-all for unmatched routes ─────────────────────────────────────
+// ─────────────────────────────────────────────
+// 404 ROUTE HANDLER
+// ─────────────────────────────────────────────
 app.all('*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route ${req.method} ${req.originalUrl} not found`,
+    message: `Route ${req.originalUrl} not found`,
   });
 });
 
-// ── Error handler (must be LAST middleware) ──────────────────────────────
+// ─────────────────────────────────────────────
+// GLOBAL ERROR HANDLER
+// ─────────────────────────────────────────────
 app.use(errorHandler);
 
-// ── Start server ─────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// SERVER START
+// ─────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
+    // Check MongoDB URI
     if (!process.env.MONGODB_URI) {
-      throw new Error(
-        'Missing MONGODB_URI. Add it to Railway Environment Variables or your local .env file.'
-      );
+      throw new Error('MONGODB_URI is missing in environment variables');
     }
 
-    await connectDB();
-
     app.listen(PORT, () => {
-      console.log(`DeskFlow API server running on port ${PORT}`);
+      console.log(`🚀 DeskFlow server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error.message);
+    console.error('❌ Server startup failed:', error.message);
     process.exit(1);
   }
 };
 
-if (require.main === module) {
-  startServer();
+startServer();
 
-  // ── Handle unhandled promise rejections globally ─────────────────────
-  process.on('unhandledRejection', (reason) => {
-    console.error('Unhandled Rejection:', reason);
-    // Graceful shutdown: close server then exit
-    process.exit(1);
-  });
-}
-
-module.exports = app;
+// ─────────────────────────────────────────────
+// HANDLE UNHANDLED PROMISE REJECTIONS
+// ─────────────────────────────────────────────
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Unhandled Rejection:', err.message);
+  process.exit(1);
+});
