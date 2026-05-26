@@ -84,13 +84,15 @@ const startServer = async () => {
   }
 };
 
-startServer();
+if (require.main === module) {
+  startServer();
 
-// ── Handle unhandled promise rejections globally ─────────────────────────
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason);
-  // Graceful shutdown: close server then exit
-  process.exit(1);
-});
+  // ── Handle unhandled promise rejections globally ─────────────────────
+  process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Rejection:', reason);
+    // Graceful shutdown: close server then exit
+    process.exit(1);
+  });
+}
 
 module.exports = app;
