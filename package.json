@@ -1,0 +1,14 @@
+{
+  "name": "deskflow",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:frontend": "npm --prefix frontend run build",
+    "start:backend": "npm --prefix backend run start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

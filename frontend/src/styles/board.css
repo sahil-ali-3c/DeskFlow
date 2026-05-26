@@ -1,0 +1,125 @@
+/* ===== Kanban Board ===== */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+}
+
+/* ===== Board Column ===== */
+.board-column {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  min-height: 400px;
+  max-height: calc(100vh - 320px);
+  transition: all var(--transition-base);
+}
+
+.board-column--over {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* ===== Column Header ===== */
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+}
+
+.column-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.board-column--open .column-header::before { background: var(--status-open); }
+.board-column--in_progress .column-header::before { background: var(--status-in-progress); }
+.board-column--resolved .column-header::before { background: var(--status-resolved); }
+.board-column--closed .column-header::before { background: var(--status-closed); }
+
+.column-title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.column-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+  border-radius: 9999px;
+}
+
+/* ===== Ticket List ===== */
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 100px;
+}
+
+.ticket-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ticket-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ticket-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* ===== Drag State ===== */
+.dragging {
+  opacity: 0.5;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .kanban-board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .board-column {
+    min-height: 300px;
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 640px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+
+  .board-column {
+    min-height: 200px;
+    max-height: 400px;
+  }
+}

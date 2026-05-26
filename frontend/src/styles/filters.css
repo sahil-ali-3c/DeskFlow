@@ -1,0 +1,111 @@
+/* ===== Filter Bar ===== */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.filter-bar .filter-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.filter-bar .filter-label svg {
+  width: 16px;
+  height: 16px;
+}
+
+.filter-bar .select {
+  width: auto;
+  min-width: 140px;
+  padding: 8px 36px 8px 12px;
+  font-size: var(--font-size-sm);
+  background-color: rgba(15, 23, 42, 0.5);
+}
+
+/* ===== SLA Toggle ===== */
+.sla-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 16px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.sla-toggle:hover {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--text-primary);
+}
+
+.sla-toggle--active {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: var(--danger);
+}
+
+.sla-toggle .sla-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all var(--transition-base);
+}
+
+.sla-toggle--active .sla-dot {
+  background: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===== Clear Filters ===== */
+.clear-filters-btn {
+  margin-left: auto;
+}
+
+/* ===== Active Filter Indicator ===== */
+.filter-active-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-md);
+  }
+
+  .filter-bar .select {
+    width: 100%;
+  }
+
+  .clear-filters-btn {
+    margin-left: 0;
+  }
+}

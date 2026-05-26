@@ -1,0 +1,28 @@
+{
+  "name": "deskflow-backend",
+  "version": "1.0.0",
+  "description": "DeskFlow - Support Ticket Triage Board API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "support",
+    "tickets",
+    "triage",
+    "helpdesk"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
