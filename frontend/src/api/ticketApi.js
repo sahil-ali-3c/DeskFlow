@@ -4,10 +4,12 @@ import { API_BASE_URL } from '../utils/constants';
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   },
-  timeout: 10000
+  timeout: 10000,
 });
+
+export default api;
 
 const unwrapResponse = (response) => {
   if (response?.data && Object.prototype.hasOwnProperty.call(response.data, 'data')) {
